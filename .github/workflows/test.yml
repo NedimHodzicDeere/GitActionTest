@@ -53,7 +53,6 @@ jobs:
       - name: Dev - Build and Deploy
         if: ${{github.event.inputs.devlOrProd == 'devl' && success()}}
         run: |
-          sam build --template ${edl-current-state-deadletter-handler.yaml}
           sam deploy --stack-name ${edl-current-state-deadletter-handler} --s3-bucket jd-us01-commoninformationservices-${devl}-system --s3-prefix deployment/edl/${projectName}/${edl-current-state-deadletter-handler} --parameter-overrides Env=${devl} --region=us-east-1
         
         
