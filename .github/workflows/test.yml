@@ -1,12 +1,12 @@
 name: edl-current-state-deadletter-handler
-on: |
-  [push]
-  inputs:
-    devlOrProd:
-      description: 'devl | prod'
-      required: true
-      default: 'devl'
-
+on: 
+  workflow_dispatch:
+    inputs:
+      devlOrProd:
+        description: 'devl | prod'
+        required: true
+        default: 'devl'
+  
 env:
   projectName: "edl-current-state-deadletter-handler"
   isPullRequest: BRANCH_NAME ==~ /PR-([0-9]+)/
