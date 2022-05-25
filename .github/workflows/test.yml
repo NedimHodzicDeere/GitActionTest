@@ -19,11 +19,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      
       - name: NodeJS
         uses: actions/setup-node@v3.0.0
         with:
           node-version: '14.x'
+          
       - name: SonarQube Analysis
         if: github.event.ref == 'refs/heads/main'
+        # run: |
+          # ${scannerHome}/bin/sonar-scanner
+        run: echo "SonarQube Analysis"
+          
+      - name: Veracode SCA
+        if: github.event.ref == 'refs/heads/main'
         run: |
-          ${scannerHome}/bin/sonar-scanner
+          echo "'curl -sSL https://download.sourceclear.com/ci.sh | sh'"
