@@ -26,6 +26,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
+      - name: Setup SAM
+      - uses: aws-actions/setup-sam@v2
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      
       - name: NodeJS
         uses: actions/setup-node@v3.0.0
         with:
@@ -41,3 +49,31 @@ jobs:
         if: github.event.ref == 'refs/heads/main'
         run: |
           echo "'curl -sSL https://download.sourceclear.com/ci.sh | sh'"
+
+      - name: Dev - Build and Deploy
+        if: ${{github.event.inputs.environment == 'devl' && success()}}
+        run: |
+          sam build --template ${edl-current-state-deadletter-handler.yaml}
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
