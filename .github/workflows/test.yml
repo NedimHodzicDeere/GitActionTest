@@ -2,10 +2,9 @@ name: edl-current-state-deadletter-handler
 on: |
   [push]
   inputs:
-      env:
-        description: 'devl | prod'
-        required: true
-        default: 'devl'
+      description: 'devl | prod'
+      required: true
+      default: 'devl'
 
 env:
   projectName: "edl-current-state-deadletter-handler"
