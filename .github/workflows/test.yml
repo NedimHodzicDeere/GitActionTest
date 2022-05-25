@@ -50,10 +50,10 @@ jobs:
         run: |
           echo "'curl -sSL https://download.sourceclear.com/ci.sh | sh'"
 
-      - name: Dev - Build and Deploy
-        if: ${{github.event.inputs.environment == 'devl' && success()}}
-        run: |
-          sam build --template ${edl-current-state-deadletter-handler.yaml}
+#       - name: Dev - Build and Deploy
+#         if: ${{github.event.inputs.environment == 'devl' && success()}}
+#         run: |
+#           sam build --template ${edl-current-state-deadletter-handler.yaml}
         
         
         
