@@ -2,9 +2,13 @@ name: edl-current-state-deadletter-handler
 on: push
   
 jobs:
-  print-job:
+  edl-current-state-deadletter-handler:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: print
         run: echo "hello world"
+      - name: NodeJS
+        uses: actions/setup-node@v3.0.0
+        with:
+          node-version: '14.x'
