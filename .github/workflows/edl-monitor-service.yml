@@ -1,0 +1,106 @@
+name: edl-monitor-service
+on:
+  workflow_dispatch:
+    inputs:
+      ENVIROMENT:
+        type: 'choice'
+        description: 'Enviroment'
+        default: 'devl'
+        options:
+          - 'devl'
+          - 'prod'
+     
+env:
+  projectName: "edl-monitor-service"
+     
+jobs:
+  edl-monitor-service:
+    runs-on: prod-linux-edl
+    if: github.event.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Node Setup
+        uses: actions/setup-node@v3.0.0
+        with: 
+          node-version: '14.17.3'
+          
+      - name: build and tesr
+        run: |
+          npm i
+          npm t
+      
+#       - name: Veracode SCA
+#         uses: EDL/ActionTemplates/.github/actions/Veracodesca@master
+        
+#       - name: Get Current Timestamp
+#         id: timestamp
+#         run: echo "::set-output name=timestamp::$(date +%s)"
+        
+#       - name: Print Timestamp
+#         run: echo ${{ steps.timestamp.outputs.timestamp }}
+        
+#       - name: Devl assumerole
+#         if: ${{ github.event.inputs.ENVIROMENT == 'devl' }}
+#         uses: EDL/ActionTemplates/.github/actions/CommonSteps/assumeJenkinsRole@master
+#         with:
+#           accountNumber: 541843007032
+#           roleName: system-roles/github-actions-runners/actions-runner-edl
+#           sessionName: devl-assume
+        
+#       - name: get_aws_credentials
+#         if: ${{ github.event.inputs.ENVIROMENT == 'devl' }}
+#         uses: github-actions-enablement/get-aws-credentials@v2
+#         with:
+#           OKTA_CLIENT_ID: ${{ secrets.OKTA_CLIENT_ID }}
+#           OKTA_CLIENT_SECRET: ${{ secrets.OKTA_CLIENT_SECRET }}
+#           ROLE_ARN: "arn:aws:iam::541843007032:role/system-roles/github-actions-runners/actions-runner-edl"
+        
+#       - name: Package
+#         uses: EDL/ActionTemplates/.github/actions/CommonSteps/zipAndStash@master
+#         with:
+#           filename: $projectName
+        
+#       - name: Dev - Deploy Stack
+#         if: ${{ github.event.inputs.ENVIROMENT == 'devl' }}
+#         run: |
+#           aws cloudformation deploy --template-file ci/cloudFormationTemplates/edl-monitor-service-streams-devl.yaml --region us-east-1 --stack-name edl-monitor-service-streams-stack --s3-bucket jd-us01-commoninformationservices-devl-system --s3-prefix templates/jd-us01-commoninformationservices-devl-system --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
+        
+# #       - name: Dev - Deploy Stack
+# #         if: ${{ github.event.inputs.ENVIROMENT == 'devl' }}
+# #         uses: EDL/ActionTemplates/.github/actions/CommonSteps/vars@master
+# #         with:
+# #           sharedAccountNumber: 541843007032
+# #           archFile: edl-data-catalog-es-service-stack.j2
+# #           variableFile: edl-data-catalog-es-service-devl.yaml
+# #           stackName: edl-monitor-service
+# #           stackConfigFile: ci/config/stack.config
+# #           s3Bucket: jd-us01-commoninformationservices-devl-system
+# #           region: us-east-1
+# #           roleName: jenkins/appslave-jenkins-edl
+          
+# #       - name: Dev - Deploy Stack
+# #         if: ${{ github.event.inputs.ENVIROMENT == 'devl' }}
+# #         uses: EDL/ActionTemplates/.github/actions/CommonSteps/deployStack@master
+# #         with:
+# #           file: ci/cloudFormationTemplates/edl-data-catalog-es-service-devl
+# #           stack: edl-monitor-service-streams-devl
+# #           env: devl
+# #           projectName: edl-monitor-service
+# #           timestamp: ${{ steps.timestamp.outputs.timestamp }}
+          
+#       - name: Dev - Upload Package
+#         if: ${{github.event.inputs.ENVIROMENT == 'devl' }}
+#         uses: EDL/ActionTemplates/.github/actions/nodeLambdaDeploy@master
+#         with:
+#           lambdaName: DegradationHandler
+#           filename: edl-monitor-service.zip
+#           bucketName: jd-us01-commoninformationservices-devl-system
+#           dirName: deployment/edl
+#           region: us-east-1
+#           directDeploy: true
+          
+#       - name: clean up aws credentials
+#         if: ${{ failure() || success() }}
+#         run: |
+#           rm -rf ~/.aws/credentials
