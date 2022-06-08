@@ -16,7 +16,6 @@ env:
 jobs:
   edl-monitor-service:
     runs-on: prod-linux-edl
-    if: github.event.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
       
