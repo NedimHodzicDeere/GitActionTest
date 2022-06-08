@@ -96,3 +96,8 @@ jobs:
           dirName: deployment/edl
           region: us-east-1
           directDeploy: true
+
+      - name: Clean Up AWS Credentials
+        if: ${{ failure() || success() }}
+        run: |
+          rm -rf ~/.aws/credentials
