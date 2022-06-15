@@ -1,0 +1,87 @@
+name: edl-records
+on:
+  # push:
+  #   branches: [ master ]
+  # pull_request:
+  #   branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      env:
+        type: 'choice'
+        description: Environment Name
+        options:
+          - 'devl'
+          - 'prod'
+env:
+  VERACODE_API_ID: ${{secrets.VERACODE_API_ID}}
+  VERACODE_API_KEY: ${{secrets.VERACODE_API_KEY}}
+
+jobs:
+  setup:
+    runs-on: deere-ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build and unit test
+        uses: EDL/ActionTemplates/.github/actions/CommonSteps/sbtBuildTest@master
+      # - name: sonarqube analysis
+      #   if: github.event.ref == 'refs/heads/master'
+      #   uses: EDL/ActionTemplates/.github/actions/CommonSteps/sonarQube@master
+      #   with:
+      #     sonar_host_url: https://sonarqube.sharedservices-prod.us.i18.c01.johndeerecloud.com
+      - name: veracode
+        if: github.event.ref == 'refs/heads/master'
+        uses: EDL/ActionTemplates/.github/actions/Veracodesca@master
+  devl deploy:
+    needs: [setup]
+    runs-on: deere-ubuntu-latest
+    if: github.event.ref == 'refs/heads/master' && github.event.inputs.env == 'devl'
+    steps:
+      - uses: actions/checkout@v2
+      - name: get dev credentials
+        uses: github-actions-enablement/get-aws-credentials@v2
+        with:
+          OKTA_CLIENT_ID: ${{ secrets.OKTA_CLIENT_ID }}
+          OKTA_CLIENT_SECRET: ${{ secrets.OKTA_CLIENT_SECRET }}
+          ROLE_ARN: "arn:aws:iam::541843007032:role/system-roles/github-actions-runners/actions-runner-edl"
+      - name: dev deploy stack
+        uses: EDL/ActionTemplates/.github/actions/CommonSteps/cloudFormation@master
+        with:
+          fileName: infrastructure/cloudFormationTemplates/edl-records-api-stack.j2
+          region: us-east-1
+          stackName: edl-records-api-stack
+          s3-bucket: jd-us01-commoninformationservices-devl-system
+      - name: dev deploy code
+        uses: EDL/ActionTemplates/.github/actions/CommonSteps/awsBeanstalkDeploy@master
+      - name: dev health check
+        run:  aws elasticbeanstalk describe-environment-health --environment-name  edlRecords-devl --region us-east-1 --attribute-names All > .beanstalk-status.json
+      - name: dev clean up aws credentials
+        if: ${{ always() }}
+        run: |
+         rm -rf ~/.aws/credentials
+  prod deploy:
+    needs: [setup,devl deploy]
+    runs-on: deete-ubuntu-latest
+    if: github.event.ref == 'refs/heads/master' && github.event.inputs.env == 'prod'
+    steps:
+      - uses: actions/checkout@v2
+      - name: get prod credentials
+        uses: github-actions-enablement/get-aws-credentials@v2
+        with:
+          OKTA_CLIENT_ID: ${{ secrets.OKTA_CLIENT_ID }}
+          OKTA_CLIENT_SECRET: ${{ secrets.OKTA_CLIENT_SECRET }}
+          ROLE_ARN: "arn:aws:iam::305463345279:role/system-roles/github-actions-runners/actions-runner-edl"
+      - name: prod deploy stack
+        uses: EDL/ActionTemplates/.github/actions/CommonSteps/cloudFormation@master
+        with:
+          fileName: infrastructure/cloudFormationTemplates/edl-records-api-stack.j2
+          region: us-east-1
+          stackName: edl-records-api-stack
+          s3-bucket: jd-us01-commoninformationservices-prod-system
+      - name: prod deploy code
+        uses: EDL/ActionTemplates/.github/actions/CommonSteps/awsBeanstalkDeploy@master
+      - name: prod health check
+        run:  aws elasticbeanstalk describe-environment-health --environment-name  edlRecords-prod --region us-east-1 --attribute-names All > .beanstalk-status.json
+      - name: prod clean up aws credentials
+        if: ${{ always() }}
+        run: |
+         rm -rf ~/.aws/credentials
