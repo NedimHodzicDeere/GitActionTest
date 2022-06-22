@@ -6,7 +6,7 @@ env:
 jobs:
   print:
     runs-on: ubuntu-latest
-    steps:
-      name: print
-      run: |
-        echo "$COOL_NAME"
+    steps: 
+      - name: print
+        run: |
+          echo "$COOL_NAME"
