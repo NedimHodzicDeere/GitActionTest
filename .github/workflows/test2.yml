@@ -1,0 +1,12 @@
+name: test2
+on:
+  workflow_dispatch:
+env:
+  COOL_NAME: "hello nedim"
+jobs:
+  print:
+    runs-on: ubuntu-latest
+    steps:
+      name: print
+      run: |
+        echo "$COOL_NAME"
