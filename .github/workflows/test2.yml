@@ -1,6 +1,13 @@
 name: test2
 on:
   workflow_dispatch:
+    inputs:
+      env:
+        type: choice
+        description: Environment Name
+        options:
+          - 'dev'
+          - 'prod'
 env:
   COOL_NAME: "hello nedim"
 jobs:
@@ -8,5 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
       - name: print
+        if: github.event.inputs.env == 'dev'
         run: |
           echo "$COOL_NAME"
