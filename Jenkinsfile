@@ -23,7 +23,7 @@ stages {
             when { branch 'master' }
             steps { sh 'curl -sSL https://download.sourceclear.com/ci.sh | sh' }
         }
-          stage('Dev - Build and Deploy') {
+        stage('Dev - Build and Deploy') {
             agent { label 'devl' }
             when {
                 beforeAgent true
